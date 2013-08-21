@@ -1,0 +1,6 @@
+{"shell-version": ["3.8.4"], 
+"uuid": "githubPull.boris@avezoete.be", 
+"name": "Github pull request", 
+"gettext-domain": "githubPull", 
+ "settings-schema": "org.gnome.shell.extensions.githubPull", 
+"description": "List pending github pull requests for a project"}

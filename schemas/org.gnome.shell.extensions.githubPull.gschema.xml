@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<schemalist gettext-domain="gnome3-jenkins">
+	<schema path="/org/gnome/shell/extensions/githubPull/" id="org.gnome.shell.extensions.githubPull">
+		<!-- jenkins connection -->
+		<key type="s" name="settings-json">
+			<default>'
+				{
+					"repos": [
+						{
+							"id":1,
+							"name": "Default",
+							"repo": "Octocat/Test",
+							"token": "token"
+						}
+					]
+				}
+			'</default>
+			<summary>JSON settings</summary>
+			<description>Settings for all Git pull repos in JSON format.</description>
+		</key>
+	</schema>
+</schemalist>
