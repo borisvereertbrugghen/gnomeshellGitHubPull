@@ -34,8 +34,14 @@ function _showHello() {
    
 }
 
+function doLog(logging){
+	log("githubPull-"+new Date().toLocaleTimeString()+":"+logging);
+}
+
 function addServerInfo(serverInfo){
+	doLog(serverInfo.name+" looping serverInfo");
 	if(!serverInfo.button){
+		doLog(serverInfo.name+" Adding serverInfoButton");
 		serverInfo.button = new PanelMenu.Button(0.25, "Pull Requests", false) ;
 		let main_box = new St.BoxLayout({ style_class: 'activities_box'});		
 		let icon = new St.Icon({ icon_name: 'GitHub-Mark-32px',icon_size : ICON_SIZE_INDICATOR, style:"background-color:#555555;" });
@@ -60,28 +66,29 @@ function addServerInfo(serverInfo){
 
             // this.box.add(this.icon);
     	box.add(label);
-    	serverMenuItem = new PopupBaseMenuItem();
+    	var serverMenuItem = new PopupBaseMenuItem();
     	serverMenuItem.addActor(box);
     	serverInfo.popup.addMenuItem(serverMenuItem);
 	}
 	var request = Soup.Message.new('GET',serverInfo.getUrl());
     request.request_headers.append('Authorization', serverInfo.getAuthentication());
+    request.request_headers.append('User-Agent', 'githubPull.boris@avezoete.be - git@github.com:borisvereertbrugghen/gnomeshellGitHubPull.git');
     _httpSession.send_message(request);//, function(_httpSession, message) {
     	// log("queue_message");
 	    if (request.status_code !== 200) {
 	    	serverMenuItem = new PopupBaseMenuItem();
 	    	serverMenuItem.addActor(new St.Label({ text: ''+request.status_code+''+request.response_body.data+' "'+serverInfo.getAuthentication()+'"'}));
 	    	serverInfo.popup.addMenuItem(serverMenuItem);
-	    	//log("no 200"+request.status_code);
+	    	log(""+serverInfo.name+"no 200"+request.status_code);
+		    log(request.response_body.data);
 	    }else{
 	    	var pullsJSON = request.response_body.data;
-	    	log(pullsJSON);
 	    	var pulls = JSON.parse(pullsJSON);
+	    	doLog(serverInfo.name+" got pullRequestData");
 
 	    	addMenuItems(pulls,serverInfo.popup,serverInfo);
 	    	
 	    }
-	    log(request.response_body.data);
 	 // });
 }
 
@@ -98,11 +105,12 @@ function addMenuItems(pulls,popup,serverInfo){
 	     if(popup.numMenuItems >= i+1){
 	    	 serverMenuItem = popup._getMenuItems()[i+1];
 	     }
+	     doLog(serverInfo.name+" do "+pull.number);
 	     if(serverMenuItem){
 	    	 serverMenuItem.pull=pull;
-	    	 if(serverMenuItem.pullNumber!=pull.number){
+	    	 //if(serverMenuItem.pullNumber!=pull.number){
 	    		 serverMenuItem.theLabel.text=pull.number+": "+pull.title;
-	    	 }
+	    	 //}
 	    	 //always update the details update details:
 	    	 serverMenuItem.details.text= pull.created_at+" - "+pull.updated_at+"\n"+pull.head.repo.owner.login;
 	     }else{
@@ -144,8 +152,8 @@ function init(extensionMeta) {
 
 function enable() {
 
-    settings = Convenience.getSettings();
-    settingsJSON = Settings.getSettingsJSON(settings);
+    let settings = Convenience.getSettings();
+    let settingsJSON = Settings.getSettingsJSON(settings);
 	servers=new Array();
 //	 servers.push(new ServerInfo.ServerInfo('BuildIT','PearlChain/BuildIT'));
 //	 servers.push(new ServerInfo.ServerInfo('ShapeIT','PearlChain/ShapeIT'));
@@ -165,7 +173,6 @@ function enable() {
 
 function disable() {
 	Mainloop.source_remove(_mainloop);
-	button.destroy();
 	if(servers){
 	 servers.forEach(
 		        function(server)
