@@ -13,7 +13,13 @@ let DefaultSettings = {
             "repo": "Octocal/Test",
 			"token": "token"
         }
-    ]
+    ],
+    "user":
+         {
+            "id":"1",
+            "name":"Default",
+            "token":"token"
+         }
 }
 
 // helper to prevent weird errors if possible settings change in future updates by using default settings
@@ -24,15 +30,24 @@ function getSettingsJSON(settings)
 	// assert that at least default settings are available
 	settingsJSON = settingsJSON || DefaultSettings;
 	settingsJSON.servers = settingsJSON.servers || DefaultSettings.servers;
-	
-	for( let i=0 ; i<settingsJSON.repos.length ; ++i )
+	let i;
+	for( i=0 ; i<settingsJSON.repos.length ; ++i )
 	{
-		for( setting in DefaultSettings.repos[0] )
+		let setting;
+		for(setting in DefaultSettings.repos[0] )
 		{
 			if( !(setting in settingsJSON.repos[i]) )
 				settingsJSON.repos[i][setting] = DefaultSettings.repos[0][setting];
 		}
 	}
-	
+	if(!settingsJSON.user){
+		settingsJSON.user = DefaultSettings.user;
+	}
+	let setting;
+	for(setting in DefaultSettings.user)
+	{
+		if( !(setting in settingsJSON.user) )
+			settingsJSON.user[setting] = DefaultSettings.user[setting];
+	}
 	return settingsJSON;
 }

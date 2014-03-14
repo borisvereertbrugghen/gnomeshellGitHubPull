@@ -37,10 +37,10 @@ function buildIconSwitchSetting(icon, label, setting_name, server_num)
 }
 
 // update json settings for server in settings schema
-function updateServerSetting(server_num, setting, value)
+function updateUserSetting(setting, value)
 {
     settingsJSON = Settings.getSettingsJSON(settings);
-    settingsJSON["repos"][server_num][setting] = value;
+    settingsJSON["user"][setting] = value;
     settings.set_string("settings-json", JSON.stringify(settingsJSON));
 }
 
@@ -122,9 +122,60 @@ function addTabPanel(notebook, server_num)
     notebook.append_page(tabContent, tabWidget);
 }
 
+function userIssues(notebook)
+{
+    // use server name as tab label
+    let tabLabel = new Gtk.Label({ label: "Issues"});
+    
+    let vbox = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, border_width: 10 });
+
+    // *** jenkins connection ***
+    let labelJenkinsConnection = new Gtk.Label({ label: "<b>" + _("Git hub Issues") + "</b>", use_markup: true, xalign: 0 });
+    vbox.add(labelJenkinsConnection);
+
+    let vboxJenkinsConnection = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, margin_left: 20, margin_bottom: 15 });
+    
+        // server name
+        let hboxServerName = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL});
+        let labelServerName = new Gtk.Label({label: _("Name"), xalign: 0});
+        let inputServerName = new Gtk.Entry({ hexpand: true, text: settingsJSON['user']['name'] });
+
+        inputServerName.connect("changed", Lang.bind(this, function(input){ tabLabel.set_text(input.text); updateUserSetting("name", input.text); }));
+
+        hboxServerName.pack_start(labelServerName, true, true, 0);
+        hboxServerName.add(inputServerName);
+        vboxJenkinsConnection.add(hboxServerName);
+
+        // token
+        let hboxToken = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL});
+        let labelToken = new Gtk.Label({label: _("Token"), xalign: 0});
+        let inputToken = new Gtk.Entry({ hexpand: true, text: ''+settingsJSON['user']['token'] });
+
+        inputToken.connect("changed", Lang.bind(this, function(input){ updateUserSetting("token", input.text); }));
+
+        hboxToken.pack_start(labelToken, true, true, 0);
+        hboxToken.add(inputToken);
+        vboxJenkinsConnection.add(hboxToken);
+        vbox.add(vboxJenkinsConnection);
+        
+
+    // widget for tab containing label and close button
+    let tabWidget = new Gtk.HBox({ spacing: 5 });
+    tabWidget.add(tabLabel);
+    tabWidget.show_all();
+    
+    // tab content
+    let tabContent = new Gtk.ScrolledWindow({ vexpand: true });
+    tabContent.add_with_viewport(vbox);
+    
+    // append tab to notebook
+    notebook.append_page(tabContent, tabWidget);
+}
+
 function buildPrefsWidget() {
 	// *** tab panel ***
 	let notebook = new Gtk.Notebook();
+	userIssues(notebook);
 	
 	for( let i=0 ; i<settingsJSON['repos'].length ; ++i )
 	{

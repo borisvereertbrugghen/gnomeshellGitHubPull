@@ -12,7 +12,10 @@
 							"repo": "Octocat/Test",
 							"token": "token"
 						}
-					]
+					],
+					"user": {
+						"id":1,"name":"Default","token":"token"
+					}
 				}
 			'</default>
 			<summary>JSON settings</summary>
